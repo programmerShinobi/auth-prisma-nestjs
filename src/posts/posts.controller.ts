@@ -12,8 +12,6 @@ import {
 import { PostsService } from './posts.service';
 import { Post as PostModel } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
-import { paginate } from 'nestjs-paginate';
-import { PrismaService } from 'prisma/prisma.service';
 
 @Controller({
   path: '',
