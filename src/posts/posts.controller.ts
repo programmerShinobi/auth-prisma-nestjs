@@ -5,10 +5,12 @@ import {
   Param,
   Post,
   Put,
-  Body
+  Body,
+  UseGuards
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostModel } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 
 @Controller({
   path: '',
@@ -47,6 +49,7 @@ export class PostsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('post')
   async createDraft(
     @Body() postData: { title: string; content?: string; authorEmail: string },
@@ -61,6 +64,7 @@ export class PostsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put('publish/:id')
   async publishPost(@Param('id') id: string): Promise<PostModel> {
     return this.postsService.updatePost({
@@ -69,6 +73,7 @@ export class PostsController {
     });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('post/:id')
   async deletePost(@Param('id') id: string): Promise<PostModel> {
     return this.postsService.deletePost({ id: id });
