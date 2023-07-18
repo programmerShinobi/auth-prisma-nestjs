@@ -6,11 +6,14 @@ import {
   Post,
   Put,
   Body,
-  UseGuards
+  UseGuards,
+  Query
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post as PostModel } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { paginate } from 'nestjs-paginate';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Controller({
   path: '',
@@ -18,7 +21,21 @@ import { JwtAuthGuard } from 'src/auth/jwt.guard';
 })
 export class PostsController {
   constructor(private readonly postsService: PostsService) { }
-  
+
+  @Get('posts')
+  async getPaginatedPosts(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<PostModel[]> {
+    const [items, itemCount, pageCount] = await this.postsService.allPosts({
+      page,
+      limit,
+      where: { published: true },
+    });
+
+    return items;
+  }
+
   @Get('post/:id')
   async getPostById(@Param('id') id: string): Promise<PostModel> {
     return this.postsService.post({ id: id });

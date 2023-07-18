@@ -6,6 +6,24 @@ import { Post, Prisma } from '@prisma/client';
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
+  async allPosts(options: { page: number; limit: number; where?: any }): Promise<[Post[], number, number]> {
+    const { page, limit, where } = options;
+    const queryBuilder = this.prisma.post.findMany({
+      where,
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    const [items, totalItems] = await Promise.all([
+      queryBuilder,
+      this.prisma.post.count({ where }),
+    ]);
+
+    const pageCount = Math.ceil(totalItems / limit);
+
+    return [items, totalItems, pageCount];
+  }
+
   async post(
     postWhereUniqueInput: Prisma.PostWhereUniqueInput,
   ): Promise<Post | null> {
