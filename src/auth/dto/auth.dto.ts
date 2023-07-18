@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsEmail, Length } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, Length, IsStrongPassword } from 'class-validator';
 
 export class AuthDto {
   @IsNotEmpty()
@@ -8,6 +8,7 @@ export class AuthDto {
 
   @IsNotEmpty()
   @IsString()
+  @IsStrongPassword()
   @Length(3, 20, { message: 'Password has to be at between 3 and 20 chars' })
   public password: string;
   
