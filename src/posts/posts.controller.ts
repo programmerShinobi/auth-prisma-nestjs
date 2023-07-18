@@ -16,7 +16,7 @@ export class PostsController {
   
   @Get('post/:id')
   async getPostById(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.post({ id: Number(id) });
+    return this.postsService.post({ id: id });
   }
 
   @Get('feed')
@@ -61,13 +61,13 @@ export class PostsController {
   @Put('publish/:id')
   async publishPost(@Param('id') id: string): Promise<PostModel> {
     return this.postsService.updatePost({
-      where: { id: Number(id) },
+      where: { id: id },
       data: { published: true },
     });
   }
 
   @Delete('post/:id')
   async deletePost(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.deletePost({ id: Number(id) });
+    return this.postsService.deletePost({ id: id });
   }
 }
