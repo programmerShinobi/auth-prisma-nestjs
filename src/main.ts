@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from 'src/app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import  helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
 import { clientUrl } from './utils/constants';
@@ -15,6 +15,10 @@ async function bootstrap() {
   app.use(helmet());
 
   app.use(cookieParser());
+
+  app.enableVersioning({
+    type: VersioningType.URI
+  })
 
   await app.listen(3000);
 }
