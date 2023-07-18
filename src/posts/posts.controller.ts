@@ -10,7 +10,10 @@ import {
 import { PostsService } from './posts.service';
 import { Post as PostModel } from '@prisma/client';
 
-@Controller()
+@Controller({
+  path: '',
+  version: '1'
+})
 export class PostsController {
   constructor(private readonly postsService: PostsService) { }
   
