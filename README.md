@@ -58,6 +58,55 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
+## Endpoint
+
+```bash
+# auth signup
+[POST] : http://localhost:3000/v1/auth/signup
+Body -> raw :
+{
+    "email": "email@opencloud.id",
+    "password": "str0ngP@ssw0rd!95"
+}
+
+# auth signin
+[POST] : http://localhost:3000/v1/auth/signin
+Body -> raw :
+{
+    "email": "email@opencloud.id",
+    "password": "str0ngP@ssw0rd!95"
+}
+
+# auth signout
+[GET] : http://localhost:3000/v1/auth/signout
+
+
+# posts page 1 & limit 3
+[GET] : http://localhost:3000/v1/posts?page=1&limit=3
+
+# posts by filter(value) page 1 & limit 3
+[GET] : http://localhost:3000/v1/posts/filter/value?page=1&limit=3
+
+# post detail by uuid
+[GET] : http://localhost:3000/v1/posts/{:uuid}
+
+# create post
+[POST] : http://localhost:3000/v1/posts
+Body -> raw :
+{
+    "title" : "Others",
+    "content" : "This is content others",
+    "authorEmail" : "email@opencloud.id"
+}
+
+# publish post by uuid
+[PUT] : http://localhost:3000/v1/posts/publish/{:uuid}
+
+# delete post by uuid
+[DELETE] : http://localhost:3000/v1/posts/{:uuid}
+
+```
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
