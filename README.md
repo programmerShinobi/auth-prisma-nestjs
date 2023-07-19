@@ -63,7 +63,7 @@ $ yarn run test:cov
 ```bash
 # auth signup
 [POST] : http://localhost:3000/v1/auth/signup
-Body -> raw :
+Body >>> raw :
 {
     "email": "email@opencloud.id",
     "password": "str0ngP@ssw0rd!95"
@@ -71,7 +71,7 @@ Body -> raw :
 
 # auth signin
 [POST] : http://localhost:3000/v1/auth/signin
-Body -> raw :
+Body >>> raw :
 {
     "email": "email@opencloud.id",
     "password": "str0ngP@ssw0rd!95"
@@ -92,7 +92,7 @@ Body -> raw :
 
 # create post
 [POST] : http://localhost:3000/v1/posts
-Body -> raw :
+Body >>> raw :
 {
     "title" : "Others",
     "content" : "This is content others",
