@@ -7,90 +7,100 @@ import {
   Put,
   Body,
   UseGuards,
-  Query
+  Query,
+  Res,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { Post as PostModel } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { CreatePostDto } from './dto/posts.dto';
+import { Response } from 'express';
+
+interface PostControllerInterface {
+  createPost(dto: CreatePostDto, res: Response): Promise<void>;
+  getPaginatedPosts(res: Response): Promise<void>;
+  getFilteredPosts(searchString: string, res: Response,): Promise<void>;
+  getPostById(id: string, res: Response): Promise<void>;
+  publishPost(id: string, res: Response): Promise<void>;
+  deletePost(id: string, res: Response): Promise<void>;
+}
 
 @Controller({
-  path: '',
+  path: 'posts',
   version: '1'
 })
-export class PostsController {
+export class PostsController implements PostControllerInterface {
   constructor(private readonly postsService: PostsService) { }
 
-  @Get('posts')
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async createPost(
+    @Body() dto: CreatePostDto,
+    @Res() res: Response
+  ): Promise<void> {
+    const { title, content, authorEmail } = dto;
+    await this.postsService.createPost({
+      title,
+      content,
+      author: {
+        connect: { email: authorEmail },
+      },
+    }, res);
+  }
+
+  @Get()
   async getPaginatedPosts(
+    @Res() res: Response,
     @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ): Promise<PostModel[]> {
-    const [items, itemCount, pageCount] = await this.postsService.allPosts({
+    @Query('limit') limit: number = 10
+  ) : Promise<void> {
+    await this.postsService.posts({
       page,
       limit,
-      where: { published: true },
-    });
-
-    return items;
+      where: { published: true }
+    }, res);
   }
 
-  @Get('post/:id')
-  async getPostById(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.post({ id: id });
-  }
-
-  @Get('feed')
-  async getPublishedPosts(): Promise<PostModel[]> {
-    return this.postsService.posts({
-      where: { published: true },
-    });
-  }
-
-  @Get('filtered-posts/:searchString')
+  @Get('filter/:searchString')
   async getFilteredPosts(
     @Param('searchString') searchString: string,
-  ): Promise<PostModel[]> {
-    return this.postsService.posts({
+    @Res() res: Response,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) : Promise<void> {
+    await this.postsService.posts({
+      page,
+      limit,
       where: {
+        AND: { published: true },
         OR: [
           {
             title: { contains: searchString },
           },
           {
             content: { contains: searchString },
-          },
+          }
         ],
       },
-    });
+    }, res);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('post')
-  async createDraft(
-    @Body() postData: { title: string; content?: string; authorEmail: string },
-  ): Promise<PostModel> {
-    const { title, content, authorEmail } = postData;
-    return this.postsService.createPost({
-      title,
-      content,
-      author: {
-        connect: { email: authorEmail },
-      },
-    });
+  @Get(':id')
+  async getPostById(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    await this.postsService.post({ id: id }, res);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('publish/:id')
-  async publishPost(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.updatePost({
+  async publishPost(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    await this.postsService.publishPost({
       where: { id: id },
-      data: { published: true },
-    });
+      data: { published: true }
+    }, res);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete('post/:id')
-  async deletePost(@Param('id') id: string): Promise<PostModel> {
-    return this.postsService.deletePost({ id: id });
+@UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deletePost(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    await this.postsService.deletePost({ id: id }, res);
   }
 }
