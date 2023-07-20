@@ -9,21 +9,14 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { jwtSecret } from 'src/utils/constants';
 import { Request, Response } from 'express';
+import AuthServiceInterface from './interface/authService.interface';
 
-interface AuthServiceInterface {
-  signup(dto: AuthDto, res: Response): Promise<void>;
-  signin(dto: AuthDto, req: Request, res: Response): Promise<void>;
-  signout(req: Request, res: Response): Promise<void>;
-  hashPassword(password: string): Promise<string>;
-  comparePasswords(args: { hash: string; password: string }): Promise<string>;
-  signToken(args: { userId: string; email: string }): Promise<string>; 
-}
 
 @Injectable()
 export class AuthService implements AuthServiceInterface{
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async signup(dto: AuthDto, res: Response): Promise<void> {
+  async signup(dto: AuthDto, res: Response): Promise<any> {
     const { email, password } = dto;
 
     const userExists = await this.prisma.user.findUnique({
@@ -46,7 +39,7 @@ export class AuthService implements AuthServiceInterface{
     res.send({ message: 'User created succefully' });
   }
 
-  async signin(dto: AuthDto, req: Request, res: Response): Promise<void> {
+  async signin(dto: AuthDto, req: Request, res: Response): Promise<any> {
     const { email, password } = dto;
 
     const foundUser = await this.prisma.user.findUnique({
@@ -81,7 +74,7 @@ export class AuthService implements AuthServiceInterface{
     res.send({ message: 'Logged in succefully' });
   }
 
-  async signout(req: Request, res: Response): Promise<void> {
+  async signout(req: Request, res: Response): Promise<any> {
     res.clearCookie('token');
     res.send({ message: 'Logged out succefully' });
   }
