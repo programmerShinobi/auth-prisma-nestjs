@@ -2,35 +2,51 @@ import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
+import { CreatePostDto } from './dto/posts.dto';
 
 interface PostServiceInterface {
-  createPost(data: Prisma.PostCreateInput, res: Response): Promise<void>;
-  posts(
-    params: {
-      page: number; limit: number; where?: any; cursor?: Prisma.PostWhereUniqueInput;
-      orderBy?: Prisma.PostOrderByWithRelationInput;
-    },
+  createPost(
+    dto: CreatePostDto,
+    res: Response
+  ): Promise<void>;
+  getPaginatedPosts(
+    page: number,
+    limit: number,
+    res: Response
+  ): Promise<void>;
+  getFilteredPosts(
+    page: number,
+    limit: number,
+    searchString: string,
     res: Response
   ): Promise<void>;
   post(
-    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
+    idString: string,
     res: Response
   ): Promise<void>;
   publishPost(
-    params: {
-      where: Prisma.PostWhereUniqueInput;
-      data: Prisma.PostUpdateInput;
-    },
+    idString: string,
     res: Response
   ): Promise<void>;
-  deletePost(where: Prisma.PostWhereUniqueInput, res: Response): Promise<void>;
+  deletePost(idString: string, res: Response): Promise<void>;
 }
 
 @Injectable()
 export class PostsService implements PostServiceInterface{
   constructor(private prisma: PrismaService) {}
 
-  async createPost(data: Prisma.PostCreateInput, res: Response): Promise<void> {
+  async createPost(
+    dto: CreatePostDto,
+    res: Response
+  ): Promise<void> {
+    const { title, content, authorEmail } = dto;
+    const data: Prisma.PostCreateInput = {
+      title,
+      content,
+      author: {
+        connect: { email: authorEmail }
+      }
+    }
     await this.prisma.post.create({
       data,
     }).then((result: any) => {
@@ -41,7 +57,6 @@ export class PostsService implements PostServiceInterface{
     }).catch((error: any) => {
       res.status(HttpStatus.BAD_REQUEST).send({ message: error });
     });
-    
   }
   
   async posts(
@@ -79,10 +94,84 @@ export class PostsService implements PostServiceInterface{
     });
   }
 
-  async post(
-    postWhereUniqueInput: Prisma.PostWhereUniqueInput,
+  async getPaginatedPosts(
+    page: number,
+    limit: number,
     res: Response
   ): Promise<void> {
+    const where = { published: true };
+    await this.prisma.post.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where,
+    }).then(async(result: any) => {
+      const [items, totalItems] = await Promise.all([
+        result,
+        this.prisma.post.count({ where }),
+      ]);
+
+      if (totalItems < 1) {
+        throw new NotFoundException("Data not found")
+      }
+
+      const pageCount = Math.ceil(totalItems / limit);
+
+      res.status(HttpStatus.OK).send({
+        message: "Data has been found",
+        data: { items, totalItems, pageCount }
+      });
+    }).catch(() => {
+      res.status(HttpStatus.NOT_FOUND).send();
+    });
+  }
+
+  async getFilteredPosts(
+    page: number,
+    limit: number,
+    searchString: string,
+    res: Response
+  ): Promise<void> {
+    const where = { 
+      AND: { published: true },
+        OR: [
+          {
+            title: { contains: searchString },
+          },
+          {
+            content: { contains: searchString },
+          }
+        ],
+     };
+    await this.prisma.post.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where,
+    }).then(async(result: any) => {
+      const [items, totalItems] = await Promise.all([
+        result,
+        this.prisma.post.count({ where }),
+      ]);
+
+      if (totalItems < 1) {
+        throw new NotFoundException("Data not found")
+      }
+
+      const pageCount = Math.ceil(totalItems / limit);
+
+      res.status(HttpStatus.OK).send({
+        message: "Data has been found",
+        data: { items, totalItems, pageCount }
+      });
+    }).catch(() => {
+      res.status(HttpStatus.NOT_FOUND).send();
+    });
+  }
+
+  async post(
+    idString: string,
+    res: Response
+  ): Promise<void> {
+    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = {id: idString};
     await this.prisma.post.findUnique({
       where: postWhereUniqueInput,
     }).then((result: any) => {
@@ -99,37 +188,40 @@ export class PostsService implements PostServiceInterface{
   }
 
   async publishPost(
-    params: {
-      where: Prisma.PostWhereUniqueInput;
-      data: Prisma.PostUpdateInput;
-    },
+    idString: string,
     res: Response
   ): Promise<void> {
+
+    const params: {
+      where: Prisma.PostWhereUniqueInput;
+      data: Prisma.PostUpdateInput;
+    } = {
+      where: { id: idString },
+      data: { published: true }
+    }
     const { data, where } = params;
     await this.prisma.post.update({
       data,
       where,
     }).then((result: any) => {
-      res.status(HttpStatus.ACCEPTED).send({
+      res.status(HttpStatus.OK).send({
         message: "Data has been published",
         data: result 
       });
     }).catch((error: any) => {
-      res.status(HttpStatus.NOT_ACCEPTABLE).send({ message: error });
+      res.status(HttpStatus.BAD_REQUEST).send({ message: error });
     });
     
   }
 
-  async deletePost(where: Prisma.PostWhereUniqueInput, res: Response): Promise<void> {
+  async deletePost(idString: string, res: Response): Promise<void> {
+    const where: Prisma.PostWhereUniqueInput = { id: idString };
     await this.prisma.post.delete({
       where,
-    }).then((result: any) => {
-      res.status(HttpStatus.ACCEPTED).send({
-        message: "Data has been deleted",
-        data: result
-      });
+    }).then(() => {
+      res.status(HttpStatus.NO_CONTENT).send();
     }).catch((error: any) => {
-      res.status(HttpStatus.NOT_ACCEPTABLE).send({ message: error });
+      res.status(HttpStatus.BAD_REQUEST).send({ message: error });
     });
   }
 }
