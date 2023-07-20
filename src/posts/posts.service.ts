@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
@@ -49,13 +49,13 @@ export class PostsService implements PostServiceInterface{
     }
     await this.prisma.post.create({
       data,
-    }).then((result: any) => {
-      res.status(HttpStatus.CREATED).send({
+    }).then((result) => {
+      return res.status(HttpStatus.CREATED).send({
         message: "Data has been created",
         data: result
       });
-    }).catch((error: any) => {
-      res.status(HttpStatus.BAD_REQUEST).send({ message: error });
+    }).catch((err) => {
+      throw new BadRequestException(err.response)
     });
   }
   
@@ -85,12 +85,12 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      res.status(HttpStatus.OK).send({
+      return res.status(HttpStatus.OK).send({
         message: "Data has been found",
         data: { items, totalItems, pageCount }
       });
-    }).catch(() => {
-      res.status(HttpStatus.NOT_FOUND).send();
+    }).catch((err) => {
+      throw new NotFoundException(err.response);
     });
   }
 
@@ -104,7 +104,7 @@ export class PostsService implements PostServiceInterface{
       skip: (page - 1) * limit,
       take: limit,
       where,
-    }).then(async(result: any) => {
+    }).then(async(result) => {
       const [items, totalItems] = await Promise.all([
         result,
         this.prisma.post.count({ where }),
@@ -116,12 +116,12 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      res.status(HttpStatus.OK).send({
+      return res.status(HttpStatus.OK).send({
         message: "Data has been found",
         data: { items, totalItems, pageCount }
       });
-    }).catch(() => {
-      res.status(HttpStatus.NOT_FOUND).send();
+    }).catch((err) => {
+      throw new NotFoundException(err.response);
     });
   }
 
@@ -158,12 +158,12 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      res.status(HttpStatus.OK).send({
+      return res.status(HttpStatus.OK).send({
         message: "Data has been found",
         data: { items, totalItems, pageCount }
       });
-    }).catch(() => {
-      res.status(HttpStatus.NOT_FOUND).send();
+    }).catch((err) => {
+      throw new NotFoundException(err.response);
     });
   }
 
@@ -178,12 +178,12 @@ export class PostsService implements PostServiceInterface{
       if (!result) {
         throw new NotFoundException("Data not found")
       }
-      res.status(HttpStatus.OK).send({
+      return res.status(HttpStatus.OK).send({
         message: "Data has been found",
         data: result
       });
-    }).catch(() => {
-      res.status(HttpStatus.NOT_FOUND).send();
+    }).catch((err) => {
+      throw new NotFoundException(err.response)
     });
   }
 
@@ -203,13 +203,13 @@ export class PostsService implements PostServiceInterface{
     await this.prisma.post.update({
       data,
       where,
-    }).then((result: any) => {
-      res.status(HttpStatus.OK).send({
+    }).then((result) => {
+      return res.status(200).send({
         message: "Data has been published",
         data: result 
       });
-    }).catch((error: any) => {
-      res.status(HttpStatus.BAD_REQUEST).send({ message: error });
+    }).catch((err) => {
+      throw new BadRequestException(err.response)
     });
     
   }
@@ -219,9 +219,9 @@ export class PostsService implements PostServiceInterface{
     await this.prisma.post.delete({
       where,
     }).then(() => {
-      res.status(HttpStatus.NO_CONTENT).send();
-    }).catch((error: any) => {
-      res.status(HttpStatus.BAD_REQUEST).send({ message: error });
+      return res.status(204).send();
+    }).catch((err) => {
+      throw new BadRequestException(err.response);
     });
   }
 }
