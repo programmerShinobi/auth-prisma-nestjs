@@ -37,14 +37,7 @@ export class PostsController implements PostControllerInterface {
     @Body() dto: CreatePostDto,
     @Res() res: Response
   ): Promise<void> {
-    const { title, content, authorEmail } = dto;
-    await this.postsService.createPost({
-      title,
-      content,
-      author: {
-        connect: { email: authorEmail },
-      },
-    }, res);
+    await this.postsService.createPost(dto, res);
   }
 
   @Get()
@@ -53,11 +46,7 @@ export class PostsController implements PostControllerInterface {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10
   ) : Promise<void> {
-    await this.postsService.posts({
-      page,
-      limit,
-      where: { published: true }
-    }, res);
+    await this.postsService.getPaginatedPosts(page, limit, res);
   }
 
   @Get('filter/:searchString')
@@ -67,40 +56,23 @@ export class PostsController implements PostControllerInterface {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) : Promise<void> {
-    await this.postsService.posts({
-      page,
-      limit,
-      where: {
-        AND: { published: true },
-        OR: [
-          {
-            title: { contains: searchString },
-          },
-          {
-            content: { contains: searchString },
-          }
-        ],
-      },
-    }, res);
+    await this.postsService.getFilteredPosts(page, limit, searchString, res);
   }
 
   @Get(':id')
   async getPostById(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    await this.postsService.post({ id: id }, res);
+    await this.postsService.post(id, res);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('publish/:id')
   async publishPost(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    await this.postsService.publishPost({
-      where: { id: id },
-      data: { published: true }
-    }, res);
+    await this.postsService.publishPost(id, res);
   }
 
-@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deletePost(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    await this.postsService.deletePost({ id: id }, res);
+    await this.postsService.deletePost(id, res);
   }
 }
