@@ -1,35 +1,9 @@
-import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
 import { CreatePostDto } from './dto/posts.dto';
-
-interface PostServiceInterface {
-  createPost(
-    dto: CreatePostDto,
-    res: Response
-  ): Promise<void>;
-  getPaginatedPosts(
-    page: number,
-    limit: number,
-    res: Response
-  ): Promise<void>;
-  getFilteredPosts(
-    page: number,
-    limit: number,
-    searchString: string,
-    res: Response
-  ): Promise<void>;
-  post(
-    idString: string,
-    res: Response
-  ): Promise<void>;
-  publishPost(
-    idString: string,
-    res: Response
-  ): Promise<void>;
-  deletePost(idString: string, res: Response): Promise<void>;
-}
+import PostServiceInterface from './interface/postsService.interface';
 
 @Injectable()
 export class PostsService implements PostServiceInterface{
@@ -38,7 +12,7 @@ export class PostsService implements PostServiceInterface{
   async createPost(
     dto: CreatePostDto,
     res: Response
-  ): Promise<void> {
+  ): Promise<any> {
     const { title, content, authorEmail } = dto;
     const data: Prisma.PostCreateInput = {
       title,
@@ -50,7 +24,7 @@ export class PostsService implements PostServiceInterface{
     await this.prisma.post.create({
       data,
     }).then((result) => {
-      return res.status(HttpStatus.CREATED).send({
+      return res.status(201).send({
         message: "Data has been created",
         data: result
       });
@@ -65,7 +39,7 @@ export class PostsService implements PostServiceInterface{
       orderBy?: Prisma.PostOrderByWithRelationInput;
     },
     res: Response
-  ): Promise<void> {
+  ): Promise<any> {
     const { page, limit, where, cursor, orderBy } = params;
     await this.prisma.post.findMany({
       skip: (page - 1) * limit,
@@ -85,7 +59,7 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      return res.status(HttpStatus.OK).send({
+      return res.status(200).send({
         message: "Data has been found",
         data: { items, totalItems, pageCount }
       });
@@ -98,7 +72,7 @@ export class PostsService implements PostServiceInterface{
     page: number,
     limit: number,
     res: Response
-  ): Promise<void> {
+  ): Promise<any> {
     const where = { published: true };
     await this.prisma.post.findMany({
       skip: (page - 1) * limit,
@@ -116,7 +90,7 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      return res.status(HttpStatus.OK).send({
+      return res.status(200).send({
         message: "Data has been found",
         data: { items, totalItems, pageCount }
       });
@@ -130,7 +104,7 @@ export class PostsService implements PostServiceInterface{
     limit: number,
     searchString: string,
     res: Response
-  ): Promise<void> {
+  ): Promise<any> {
     const where = { 
       AND: { published: true },
         OR: [
@@ -158,7 +132,7 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      return res.status(HttpStatus.OK).send({
+      return res.status(200).send({
         message: "Data has been found",
         data: { items, totalItems, pageCount }
       });
@@ -170,7 +144,7 @@ export class PostsService implements PostServiceInterface{
   async post(
     idString: string,
     res: Response
-  ): Promise<void> {
+  ): Promise<any> {
     const postWhereUniqueInput: Prisma.PostWhereUniqueInput = {id: idString};
     await this.prisma.post.findUnique({
       where: postWhereUniqueInput,
@@ -178,7 +152,7 @@ export class PostsService implements PostServiceInterface{
       if (!result) {
         throw new NotFoundException("Data not found")
       }
-      return res.status(HttpStatus.OK).send({
+      return res.status(200).send({
         message: "Data has been found",
         data: result
       });
@@ -190,7 +164,7 @@ export class PostsService implements PostServiceInterface{
   async publishPost(
     idString: string,
     res: Response
-  ): Promise<void> {
+  ): Promise<any> {
 
     const params: {
       where: Prisma.PostWhereUniqueInput;
@@ -214,7 +188,7 @@ export class PostsService implements PostServiceInterface{
     
   }
 
-  async deletePost(idString: string, res: Response): Promise<void> {
+  async deletePost(idString: string, res: Response): Promise<any> {
     const where: Prisma.PostWhereUniqueInput = { id: idString };
     await this.prisma.post.delete({
       where,

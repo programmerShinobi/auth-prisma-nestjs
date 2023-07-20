@@ -12,17 +12,9 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import PostControllerInterface from './interface/postsController.interface';
 import { CreatePostDto } from './dto/posts.dto';
 import { Response } from 'express';
-
-interface PostControllerInterface {
-  createPost(dto: CreatePostDto, res: Response): Promise<void>;
-  getPaginatedPosts(res: Response): Promise<void>;
-  getFilteredPosts(searchString: string, res: Response,): Promise<void>;
-  getPostById(id: string, res: Response): Promise<void>;
-  publishPost(id: string, res: Response): Promise<void>;
-  deletePost(id: string, res: Response): Promise<void>;
-}
 
 @Controller({
   path: 'posts',
@@ -36,8 +28,8 @@ export class PostsController implements PostControllerInterface {
   async createPost(
     @Body() dto: CreatePostDto,
     @Res() res: Response
-  ): Promise<void> {
-    await this.postsService.createPost(dto, res);
+  ): Promise<any> {
+    return this.postsService.createPost(dto, res);
   }
 
   @Get()
@@ -45,8 +37,8 @@ export class PostsController implements PostControllerInterface {
     @Res() res: Response,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10
-  ) : Promise<void> {
-    await this.postsService.getPaginatedPosts(page, limit, res);
+  ) : Promise<any> {
+    return this.postsService.getPaginatedPosts(page, limit, res);
   }
 
   @Get('filter/:searchString')
@@ -55,24 +47,24 @@ export class PostsController implements PostControllerInterface {
     @Res() res: Response,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ) : Promise<void> {
-    await this.postsService.getFilteredPosts(page, limit, searchString, res);
+  ) : Promise<any> {
+    return this.postsService.getFilteredPosts(page, limit, searchString, res);
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    await this.postsService.post(id, res);
+  async getPostById(@Param('id') id: string, @Res() res: Response): Promise<any> {
+    return this.postsService.post(id, res);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('publish/:id')
-  async publishPost(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    await this.postsService.publishPost(id, res);
+  async publishPost(@Param('id') id: string, @Res() res: Response): Promise<any> {
+    return this.postsService.publishPost(id, res);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async deletePost(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    await this.postsService.deletePost(id, res);
+  async deletePost(@Param('id') id: string, @Res() res: Response): Promise<any> {
+    return this.postsService.deletePost(id, res);
   }
 }
