@@ -2,17 +2,16 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { Response } from 'express';
-import { CreatePostDto } from './dto/posts.dto';
+import { CreatePostDto } from './dto/create/createPosts.dto'; 
 import PostServiceInterface from './interface/postsService.interface';
+import { GetPosts } from './dto/get/getPosts.dto';
+import { ItemPostDto } from './dto/items/itemsPost.dto';
 
 @Injectable()
 export class PostsService implements PostServiceInterface{
   constructor(private prisma: PrismaService) {}
 
-  async createPost(
-    dto: CreatePostDto,
-    res: Response
-  ): Promise<any> {
+  async createPost(dto: CreatePostDto): Promise<ItemPostDto> {
     const { title, content, authorEmail } = dto;
     const data: Prisma.PostCreateInput = {
       title,
@@ -21,16 +20,12 @@ export class PostsService implements PostServiceInterface{
         connect: { email: authorEmail }
       }
     }
-    await this.prisma.post.create({
-      data,
-    }).then((result) => {
-      return res.status(201).send({
-        message: "Data has been created",
-        data: result
-      });
-    }).catch((err) => {
+    try {
+      const result = await this.prisma.post.create({ data });
+      return result;
+    } catch(err) {
       throw new BadRequestException(err.response)
-    });
+    };
   }
   
   async posts(
@@ -68,43 +63,29 @@ export class PostsService implements PostServiceInterface{
     });
   }
 
-  async getPaginatedPosts(
-    page: number,
-    limit: number,
-    res: Response
-  ): Promise<any> {
+  async getPaginatedPosts(page: number, limit: number): Promise<GetPosts> {
     const where = { published: true };
-    await this.prisma.post.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      where,
-    }).then(async(result) => {
+    try {
       const [items, totalItems] = await Promise.all([
-        result,
+        this.prisma.post.findMany({
+          skip: (page - 1) * limit,
+          take: limit,
+          where,
+        }),
         this.prisma.post.count({ where }),
       ]);
 
-      if (totalItems < 1) {
-        throw new NotFoundException("Data not found")
-      }
+      if (totalItems < 1) throw new NotFoundException();
 
       const pageCount = Math.ceil(totalItems / limit);
-
-      return res.status(200).send({
-        message: "Data has been found",
-        data: { items, totalItems, pageCount }
-      });
-    }).catch((err) => {
+      const data: GetPosts = { items, totalItems, pageCount };
+      return data;
+    } catch (err) {
       throw new NotFoundException(err.response);
-    });
+    }
   }
 
-  async getFilteredPosts(
-    page: number,
-    limit: number,
-    searchString: string,
-    res: Response
-  ): Promise<any> {
+  async getFilteredPosts(page: number, limit: number, searchString: string): Promise<GetPosts> {
     const where = { 
       AND: { published: true },
         OR: [
@@ -115,57 +96,43 @@ export class PostsService implements PostServiceInterface{
             content: { contains: searchString },
           }
         ],
-     };
-    await this.prisma.post.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      where,
-    }).then(async(result: any) => {
+    };
+    
+    try {
       const [items, totalItems] = await Promise.all([
-        result,
+        this.prisma.post.findMany({
+          skip: (page - 1) * limit,
+          take: limit,
+          where,
+        }),
         this.prisma.post.count({ where }),
       ]);
 
-      if (totalItems < 1) {
-        throw new NotFoundException("Data not found")
-      }
+      if (totalItems < 1) throw new NotFoundException();
 
       const pageCount = Math.ceil(totalItems / limit);
-
-      return res.status(200).send({
-        message: "Data has been found",
-        data: { items, totalItems, pageCount }
-      });
-    }).catch((err) => {
+      const data: GetPosts = { items, totalItems, pageCount };
+      return data;
+    } catch (err) {
       throw new NotFoundException(err.response);
-    });
+    }
   }
 
-  async post(
-    idString: string,
-    res: Response
-  ): Promise<any> {
-    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = {id: idString};
-    await this.prisma.post.findUnique({
-      where: postWhereUniqueInput,
-    }).then((result: any) => {
-      if (!result) {
-        throw new NotFoundException("Data not found")
-      }
-      return res.status(200).send({
-        message: "Data has been found",
-        data: result
+  async post(idString: string): Promise<ItemPostDto> {
+    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = { id: idString };
+    try {
+      const result = await this.prisma.post.findUnique({
+        where: postWhereUniqueInput,
       });
-    }).catch((err) => {
+
+      if (!result) throw new NotFoundException();
+      return result;
+    } catch(err) {
       throw new NotFoundException(err.response)
-    });
+    };
   }
 
-  async publishPost(
-    idString: string,
-    res: Response
-  ): Promise<any> {
-
+  async publishPost(idString: string): Promise<ItemPostDto> {
     const params: {
       where: Prisma.PostWhereUniqueInput;
       data: Prisma.PostUpdateInput;
@@ -174,28 +141,32 @@ export class PostsService implements PostServiceInterface{
       data: { published: true }
     }
     const { data, where } = params;
-    await this.prisma.post.update({
-      data,
-      where,
-    }).then((result) => {
-      return res.status(200).send({
-        message: "Data has been published",
-        data: result 
+
+    try{
+      const result = await this.prisma.post.update({
+        data,
+        where,
       });
-    }).catch((err) => {
+
+      if (!result) throw new BadRequestException();
+
+      return result;
+    } catch (err){
       throw new BadRequestException(err.response)
-    });
+    }
     
   }
 
-  async deletePost(idString: string, res: Response): Promise<any> {
+  async deletePost(idString: string): Promise<ItemPostDto> {
     const where: Prisma.PostWhereUniqueInput = { id: idString };
-    await this.prisma.post.delete({
-      where,
-    }).then(() => {
-      return res.status(204).send();
-    }).catch((err) => {
+    try {
+      const result = await this.prisma.post.delete({
+        where,
+      });
+      if (!result) throw new BadRequestException();
+      return result;
+    } catch (err)  {
       throw new BadRequestException(err.response);
-    });
+    };
   }
 }

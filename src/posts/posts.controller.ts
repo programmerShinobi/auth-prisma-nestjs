@@ -13,8 +13,10 @@ import {
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import PostControllerInterface from './interface/postsController.interface';
-import { CreatePostDto } from './dto/posts.dto';
+import { CreatePostDto } from './dto/create/createPosts.dto';
 import { Response } from 'express';
+import PostsControllerDto from './dto/postsController.dto';
+
 
 @Controller({
   path: 'posts',
@@ -28,8 +30,12 @@ export class PostsController implements PostControllerInterface {
   async createPost(
     @Body() dto: CreatePostDto,
     @Res() res: Response
-  ): Promise<any> {
-    return this.postsService.createPost(dto, res);
+  ): Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.createPost(dto);
+    return res.status(201).send({
+      message: "Data has been created",
+      data: result
+    })
   }
 
   @Get()
@@ -37,8 +43,12 @@ export class PostsController implements PostControllerInterface {
     @Res() res: Response,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10
-  ) : Promise<any> {
-    return this.postsService.getPaginatedPosts(page, limit, res);
+  ) : Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.getPaginatedPosts(page, limit);
+    return res.status(200).send({
+      message: "Data has been found",
+      data: result
+    })
   }
 
   @Get('filter/:searchString')
@@ -47,24 +57,37 @@ export class PostsController implements PostControllerInterface {
     @Res() res: Response,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ) : Promise<any> {
-    return this.postsService.getFilteredPosts(page, limit, searchString, res);
+  ) : Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.getFilteredPosts(page, limit, searchString);
+    return res.status(200).send({
+      message: "Data has been found",
+      data: result
+    })
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string, @Res() res: Response): Promise<any> {
-    return this.postsService.post(id, res);
+  async getPostById(@Param('id') id: string, @Res() res: Response): Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.post(id);
+    return res.status(200).send({
+      message: "Data has been found",
+      data: result
+    }) 
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('publish/:id')
-  async publishPost(@Param('id') id: string, @Res() res: Response): Promise<any> {
-    return this.postsService.publishPost(id, res);
+  async publishPost(@Param('id') id: string, @Res() res: Response): Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.publishPost(id);
+    return res.status(200).send({
+      message: "Data has been published",
+      data: result
+    })  
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async deletePost(@Param('id') id: string, @Res() res: Response): Promise<any> {
-    return this.postsService.deletePost(id, res);
+  async deletePost(@Param('id') id: string, @Res() res: Response): Promise<Response<PostsControllerDto>> {
+    await this.postsService.deletePost(id);
+    return res.status(204).send();
   }
 }
