@@ -44,7 +44,7 @@ export class AuthService implements AuthServiceInterface{
     }
   }
 
-  async signin(dto: SigninDto, res: Response): Promise<ItemAuthDto> {
+  async signin(dto: SigninDto): Promise<ItemAuthDto> {
     const { email, password } = dto;
 
     const foundUser: ItemAuthDto = await this.prisma.user.findUnique({
@@ -62,14 +62,6 @@ export class AuthService implements AuthServiceInterface{
 
     if (!compareSuccess) throw new BadRequestException('Wrong credentials (password)');
 
-    const token = await this.signToken({
-      userId: foundUser.id,
-      email: foundUser.email,
-    });
-
-    if (!token) throw new ForbiddenException('Could not signin');
-
-    res.cookie('token', token, {});
     return foundUser;
   }
 

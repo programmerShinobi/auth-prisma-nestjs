@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res} from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Post, Req, Res} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup/signup.dto';
 import { Response } from 'express';
@@ -24,8 +24,16 @@ export class AuthController implements AuthControllerInterface {
 
   @Post('signin')
   async signin(@Res() res: Response, @Body() dto: SigninDto): Promise<Response<AuthControllerDto>> {
-    const result = await this.authService.signin(dto, res);
-    
+    const result = await this.authService.signin(dto);
+   
+    const token = await this.authService.signToken({
+      userId: result.id,
+      email: result.email,
+    });
+
+    if (!token) throw new ForbiddenException('Could not signin');
+
+    res.cookie('token', token, {});
     return res.status(200).send({
       message: 'Logged in succefully',
       data: result
