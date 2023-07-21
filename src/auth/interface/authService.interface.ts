@@ -1,10 +1,12 @@
-import { AuthDto } from "../dto/auth.dto";
+
 import { Request, Response } from "express";
+import { SignupDto } from "../dto/signup/signup.dto";
+import { SigninDto } from "../dto/signin/signIn.dto";
+import { ItemAuthDto } from "../dto/items/itemAuth.dto";
 
 export default interface AuthServiceInterface {
-  signup(dto: AuthDto, res: Response): Promise<any>;
-  signin(dto: AuthDto, req: Request, res: Response): Promise<any>;
-  signout(req: Request, res: Response): Promise<any>;
+  signup(dto: SignupDto): Promise<ItemAuthDto>;
+  signin(dto: SigninDto,res: Response): Promise<ItemAuthDto>;
   hashPassword(password: string): Promise<string>;
   comparePasswords(args: { hash: string; password: string }): Promise<string>;
   signToken(args: { userId: string; email: string }): Promise<string>; 

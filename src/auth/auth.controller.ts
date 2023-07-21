@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Post, Req, Res} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto/auth.dto';
-import { Request, Response } from 'express';
+import { SignupDto } from './dto/signup/signup.dto';
+import { Response } from 'express';
 import AuthControllerInterface from './interface/authController.interface';
+import { AuthControllerDto } from './dto/authController.dto';
+import { SigninDto } from './dto/signin/signIn.dto';
 
 @Controller({
   path: 'auth',
@@ -12,17 +14,27 @@ export class AuthController implements AuthControllerInterface {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  async signup(@Body() dto: AuthDto, @Res() res: Response): Promise<any> {
-    return this.authService.signup(dto, res);
+  async signup(@Body() dto: SignupDto, @Res() res: Response): Promise<Response<AuthControllerDto>> {
+    const result = await this.authService.signup(dto);
+    return res.status(200).send({
+      message: 'User created succefully',
+      data: result
+    });
   }
 
   @Post('signin')
-  async signin(@Req() req: Request, @Res() res: Response, @Body() dto: AuthDto): Promise<any> {
-    return this.authService.signin(dto, req, res);
+  async signin(@Res() res: Response, @Body() dto: SigninDto): Promise<Response<AuthControllerDto>> {
+    const result = await this.authService.signin(dto, res);
+    
+    return res.status(200).send({
+      message: 'Logged in succefully',
+      data: result
+    })
   }
 
   @Get('signout')
-  async signout(@Req() req: Request, @Res() res: Response): Promise<any>{
-    return this.authService.signout(req, res);
+  async signout(@Res() res: Response): Promise<Response>{
+    res.clearCookie('token');
+    return res.status(200).send({ message: 'Logged out succefully' });
   }
 }

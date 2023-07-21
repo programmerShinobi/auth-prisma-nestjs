@@ -4,79 +4,73 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { AuthDto } from './dto/auth.dto';
+import { ItemAuthDto } from './dto/items/itemAuth.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { jwtSecret } from 'src/utils/constants';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import AuthServiceInterface from './interface/authService.interface';
-
+import { SignupDto } from './dto/signup/signup.dto';
+import { SigninDto } from './dto/signin/signIn.dto';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface{
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async signup(dto: AuthDto, res: Response): Promise<any> {
-    const { email, password } = dto;
+  async signup(dto: SignupDto): Promise<ItemAuthDto> {
+    const { name, email, password } = dto;
+    try {
+      const userExists = await this.prisma.user.findUnique({
+        where: { email },
+      });
+  
+      if (userExists) throw new BadRequestException('Email already exists');
+  
+      const hashedPassword = await this.hashPassword(password);
+  
+      const result: ItemAuthDto = await this.prisma.user.create({
+        data: {
+          name,
+          email,
+          hashedPassword,
+        },
+      });
 
-    const userExists = await this.prisma.user.findUnique({
-      where: { email },
-    });
+      if (!result) throw new BadRequestException();
+      return result;
 
-    if (userExists) {
-      throw new BadRequestException('Email already exists');
+    } catch (err) {
+      throw new BadRequestException(err.response);
     }
-
-    const hashedPassword = await this.hashPassword(password);
-
-    await this.prisma.user.create({
-      data: {
-        email,
-        hashedPassword,
-      },
-    });
-
-    res.send({ message: 'User created succefully' });
   }
 
-  async signin(dto: AuthDto, req: Request, res: Response): Promise<any> {
+  async signin(dto: SigninDto, res: Response): Promise<ItemAuthDto> {
     const { email, password } = dto;
 
-    const foundUser = await this.prisma.user.findUnique({
+    const foundUser: ItemAuthDto = await this.prisma.user.findUnique({
       where: {
         email,
       },
     });
 
-    if (!foundUser) {
-      throw new BadRequestException('Wrong credentials');
-    }
+    if (!foundUser) throw new BadRequestException('Wrong credentials (email)');
 
     const compareSuccess = await this.comparePasswords({
       password,
       hash: foundUser.hashedPassword,
     });
 
-    if (!compareSuccess) {
-      throw new BadRequestException('Wrong credentials');
-    }
+    if (!compareSuccess) throw new BadRequestException('Wrong credentials (password)');
 
     const token = await this.signToken({
       userId: foundUser.id,
       email: foundUser.email,
     });
 
-    if (!token) {
-      throw new ForbiddenException('Could not signin');
-    }
+    if (!token) throw new ForbiddenException('Could not signin');
 
     res.cookie('token', token, {});
-    res.send({ message: 'Logged in succefully' });
-  }
-
-  async signout(req: Request, res: Response): Promise<any> {
-    res.clearCookie('token');
-    res.send({ message: 'Logged out succefully' });
+    return foundUser;
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -98,7 +92,7 @@ export class AuthService implements AuthServiceInterface{
     const token = await this.jwt.signAsync(payload, {
       secret: jwtSecret,
     });
-
+    
     return token;
   }
 }

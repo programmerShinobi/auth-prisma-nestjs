@@ -1,8 +1,10 @@
-import { Request, Response } from "express";
-import { AuthDto } from "../dto/auth.dto";
+import { Response } from "express";
+import { SignupDto } from "../dto/signup/signup.dto";
+import { AuthControllerDto } from "../dto/authController.dto";
+import { SigninDto } from "../dto/signin/signIn.dto";
 
 export default interface AuthControllerInterface {
-  signup(dto: AuthDto, res: Response): Promise<any>;
-  signin(req: Request, res: Response, dto: AuthDto): Promise<any>;
-  signout(req: Request, res: Response): Promise<any>;
+  signup(dto: SignupDto, res: Response): Promise<Response<AuthControllerDto>>;
+  signin(res: Response, dto: SigninDto): Promise<Response<AuthControllerDto>>;
+  signout(res: Response): Promise<Response>;
 }
