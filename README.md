@@ -60,15 +60,19 @@ $ yarn run test:cov
 
 ## Endpoint
 
-```bash
+
 # auth signup
+```bash
 [POST] : http://localhost:3000/v1/auth/signup
+```
 Body >>> raw :
+```bash
 {
     "name": "yourName",
     "email": "email@opencloud.id",
     "password": "str0ngP@ssw0rd!95"
 }
+```
 
 # auth signin
 [POST] : http://localhost:3000/v1/auth/signin
