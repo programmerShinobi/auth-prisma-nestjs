@@ -60,20 +60,17 @@ $ yarn run test:cov
 
 ## Endpoint
 
-
+```bash
 # auth signup
-```bash
 [POST] : http://localhost:3000/v1/auth/signup
-```
 Body >>> raw :
-```bash
 {
     "name": "yourName",
     "email": "email@opencloud.id",
     "password": "str0ngP@ssw0rd!95"
 }
 ```
-
+```bash
 # auth signin
 [POST] : http://localhost:3000/v1/auth/signin
 Body >>> raw :
@@ -81,20 +78,24 @@ Body >>> raw :
     "email": "email@opencloud.id",
     "password": "str0ngP@ssw0rd!95"
 }
-
+```
+```bash
 # auth signout
 [GET] : http://localhost:3000/v1/auth/signout
-
-
+```
+```bash
 # posts page 1 & limit 3
 [GET] : http://localhost:3000/v1/posts?page=1&limit=3
-
+```
+```bash
 # posts by filter(value) page 1 & limit 3
 [GET] : http://localhost:3000/v1/posts/filter/value?page=1&limit=3
-
+```
+```bash
 # post detail by uuid
 [GET] : http://localhost:3000/v1/posts/{:uuid}
-
+```
+```bash
 # create post
 [POST] : http://localhost:3000/v1/posts
 Body >>> raw :
@@ -103,13 +104,14 @@ Body >>> raw :
     "content" : "This is content others",
     "authorEmail" : "email@opencloud.id"
 }
-
+```
+```bash
 # publish post by uuid
 [PUT] : http://localhost:3000/v1/posts/publish/{:uuid}
-
+```
+```bash
 # delete post by uuid
 [DELETE] : http://localhost:3000/v1/posts/{:uuid}
-
 ```
 
 ## Support
