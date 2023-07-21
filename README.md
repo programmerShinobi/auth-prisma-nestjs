@@ -65,6 +65,7 @@ $ yarn run test:cov
 [POST] : http://localhost:3000/v1/auth/signup
 Body >>> raw :
 {
+    "name": "yourName",
     "email": "email@opencloud.id",
     "password": "str0ngP@ssw0rd!95"
 }
