@@ -28,8 +28,13 @@
 
 ## Installation
 
-```bash
+```bash 
 $ yarn install
+
+# create postgreSQL with db name : user_post_auth
+$ npx prisma generate
+$ npx prisma migrate dev
+$ npx prisma db push
 ```
 
 ## Running the app
