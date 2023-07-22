@@ -29,6 +29,7 @@
 ## Installation
 
 ```bash
+# the first step
 $ yarn install
 
 # create postgreSQL with db name : user_post_auth
