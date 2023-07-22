@@ -28,13 +28,16 @@
 
 ## Installation
 
-```bash 
+```bash
 $ yarn install
 
 # create postgreSQL with db name : user_post_auth
 $ npx prisma generate
 $ npx prisma migrate dev
 $ npx prisma db push
+
+# use data dummy with prisma seed (optional)
+$ yarn run seed
 ```
 
 ## Running the app
@@ -130,7 +133,6 @@ Body >>> raw :
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
 
 ## License
 
