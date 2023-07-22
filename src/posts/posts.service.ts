@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { Response } from 'express';
 import { CreatePostDto } from './dto/create/createPosts.dto'; 
 import PostServiceInterface from './interface/postsService.interface';
 import { GetPosts } from './dto/get/getPosts.dto';
@@ -32,8 +31,7 @@ export class PostsService implements PostServiceInterface{
     params: {
       page: number; limit: number; where?: any; cursor?: Prisma.PostWhereUniqueInput;
       orderBy?: Prisma.PostOrderByWithRelationInput;
-    },
-    res: Response
+    }
   ): Promise<any> {
     const { page, limit, where, cursor, orderBy } = params;
     await this.prisma.post.findMany({
@@ -54,10 +52,10 @@ export class PostsService implements PostServiceInterface{
 
       const pageCount = Math.ceil(totalItems / limit);
 
-      return res.status(200).send({
+      return {
         message: "Data has been found",
         data: { items, totalItems, pageCount }
-      });
+      };
     }).catch((err) => {
       throw new NotFoundException(err.response);
     });
