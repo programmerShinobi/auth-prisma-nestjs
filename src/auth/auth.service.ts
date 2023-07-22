@@ -8,7 +8,6 @@ import { ItemAuthDto } from './dto/items/itemAuth.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { jwtSecret } from 'src/utils/constants';
-import { Response } from 'express';
 import AuthServiceInterface from './interface/authService.interface';
 import { SignupDto } from './dto/signup/signup.dto';
 import { SigninDto } from './dto/signin/signIn.dto';
