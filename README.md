@@ -33,9 +33,7 @@
 $ yarn install
 
 # create postgreSQL with db name : user_post_auth
-$ npx prisma generate
 $ npx prisma migrate dev
-$ npx prisma db push
 
 # use data dummy with prisma seed (optional)
 $ yarn run seed
