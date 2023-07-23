@@ -83,7 +83,7 @@ Body >>> raw :
 [POST] : http://localhost:3000/v1/auth/signin
 Body >>> raw :
 {
-    "email": "naruto.uzumaki@shinobi.com",
+    "email": "yourName@shinobi.com",
     "password": "isPassw0rd!"
 }
 ```
