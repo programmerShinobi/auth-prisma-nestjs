@@ -3,7 +3,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { CreatePostDto } from './dto/create/createPosts.dto'; 
 import PostServiceInterface from './interface/postsService.interface';
-import { GetPosts } from './dto/get/getPosts.dto';
+import { GetPostsFunction } from './dto/get/getPosts.dto';
 import { ItemPostDto } from './dto/items/itemsPost.dto';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class PostsService implements PostServiceInterface{
   //   });
   // }
 
-  async getPosts(search: string | null, page: number, limit: number): Promise<GetPosts> {
+  async getPosts(search: string | null, page: number, limit: number): Promise<GetPostsFunction> {
     let where = {};
     if (search) {
       where = {
@@ -77,7 +77,7 @@ export class PostsService implements PostServiceInterface{
       if (totalItems < 1) throw new NotFoundException();
 
       const pageCount = Math.ceil(totalItems / limit);
-      const data: GetPosts = { items, totalItems, pageCount };
+      const data: GetPostsFunction = { items, totalItems, pageCount };
       return data;
     } catch (err) {
       throw new NotFoundException(err.response);
