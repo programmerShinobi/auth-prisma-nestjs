@@ -101,7 +101,7 @@ export class PostsService implements PostServiceInterface{
     }
   }
 
-  async post(postId: string): Promise<ItemPostDto> {
+  async getPostById(postId: string): Promise<ItemPostDto> {
     const postWhereUniqueInput: Prisma.PostWhereUniqueInput = { id: postId };
     try {
       const result = await this.prisma.post.findUnique({

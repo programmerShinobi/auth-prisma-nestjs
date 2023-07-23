@@ -56,7 +56,7 @@ export class PostsController implements PostControllerInterface {
 
   @Get(':id')
   async getPostById(@Param('id') postId: string, @Res() res: Response): Promise<Response<PostsControllerDto>> {
-    const result = await this.postsService.post(postId);
+    const result = await this.postsService.getPostById(postId);
     return res.status(200).send({
       message: "Data has been found",
       data: result
