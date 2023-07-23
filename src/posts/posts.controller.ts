@@ -18,6 +18,7 @@ import { Response } from 'express';
 import PostsControllerDto from './dto/postsController.dto';
 import { UserId } from './decorators/user-id.decorator';
 import { UserEmail } from './decorators/user-email.decorator';
+import { GetPostsParamsDto } from './dto/get/getPosts.dto';
 
 @Controller({
   path: 'posts',
@@ -28,12 +29,12 @@ export class PostsController implements PostControllerInterface {
 
   @Get()
   async getPosts(
+    @Query() dto: GetPostsParamsDto,
     @Res() res: Response,
-    @Query('search') search: string = null,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) : Promise<Response<PostsControllerDto>> {
-    const result = await this.postsService.getPosts(search, page, limit);
+    @Query('limit') limit: number,
+  ): Promise<Response<PostsControllerDto>> {
+    if (limit) dto.limit = limit;
+    const result = await this.postsService.getPosts(dto);
     return res.status(200).send({
       message: "Data has been found",
       data: result

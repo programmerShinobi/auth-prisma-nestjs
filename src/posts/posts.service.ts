@@ -3,7 +3,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { CreatePostParamsDto } from './dto/create/createPosts.dto'; 
 import PostServiceInterface from './interface/postsService.interface';
-import { GetPostsFunctionDto } from './dto/get/getPosts.dto';
+import { GetPostsFunctionDto, GetPostsParamsDto } from './dto/get/getPosts.dto';
 import { ItemPostDto } from './dto/items/itemsPost.dto';
 
 @Injectable()
@@ -44,7 +44,8 @@ export class PostsService implements PostServiceInterface{
   //   });
   // }
 
-  async getPosts(search: string | null, page: number, limit: number): Promise<GetPostsFunctionDto> {
+  async getPosts(dto: GetPostsParamsDto): Promise<GetPostsFunctionDto> {
+    const { search, page, limit } = dto;
     let where = {};
     if (search) {
       where = {
