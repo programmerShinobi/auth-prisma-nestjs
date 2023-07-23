@@ -10,15 +10,15 @@ import { ItemPostDto } from './dto/items/itemsPost.dto';
 export class PostsService implements PostServiceInterface{
   constructor(private prisma: PrismaService) {}
 
-  async createPost(dto: CreatePostDto): Promise<ItemPostDto> {
-    const { title, content, authorEmail } = dto;
+  async createPost(dto: CreatePostDto, userEmail: string): Promise<ItemPostDto> {
+    const { title, content } = dto;
     const data: Prisma.PostCreateInput = {
       title,
       content,
       author: {
-        connect: { email: authorEmail }
-      }
-    }
+        connect: { email: userEmail }
+      },
+    };
     try {
       const result = await this.prisma.post.create({ data });
       return result;
@@ -116,8 +116,8 @@ export class PostsService implements PostServiceInterface{
     }
   }
 
-  async post(idPost: string): Promise<ItemPostDto> {
-    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = { id: idPost };
+  async post(postId: string): Promise<ItemPostDto> {
+    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = { id: postId };
     try {
       const result = await this.prisma.post.findUnique({
         where: postWhereUniqueInput,
@@ -130,14 +130,14 @@ export class PostsService implements PostServiceInterface{
     };
   }
 
-  async publishPost(idPost: string, idUser: string): Promise<ItemPostDto> {
+  async publishPost(postId: string, userId: string): Promise<ItemPostDto> {
     const params: {
       where: Prisma.PostWhereUniqueInput;
       data: Prisma.PostUpdateInput;
     } = {
       where: {
-        id: idPost,
-        authorId: idUser
+        id: postId,
+        authorId: userId
       },
       data: { published: true }
     }
@@ -158,10 +158,10 @@ export class PostsService implements PostServiceInterface{
     
   }
 
-  async deletePost(idPost: string, idUser: string): Promise<ItemPostDto> {
+  async deletePost(postId: string, userId: string): Promise<ItemPostDto> {
     const where: Prisma.PostWhereUniqueInput = {
-      id: idPost,
-      authorId: idUser
+      id: postId,
+      authorId: userId
     };
     try {
       const result = await this.prisma.post.delete({
