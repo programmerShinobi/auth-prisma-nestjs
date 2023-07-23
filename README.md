@@ -73,8 +73,8 @@ $ yarn run test:cov
 Body >>> raw :
 {
     "name": "yourName",
-    "email": "email@opencloud.id",
-    "password": "str0ngP@ssw0rd!95"
+    "email": "yourName@shinobi.com",
+    "password": "isPassw0rd!"
 }
 ```
 
@@ -83,8 +83,8 @@ Body >>> raw :
 [POST] : http://localhost:3000/v1/auth/signin
 Body >>> raw :
 {
-    "email": "email@opencloud.id",
-    "password": "str0ngP@ssw0rd!95"
+    "email": "naruto.uzumaki@shinobi.com",
+    "password": "isPassw0rd!"
 }
 ```
 
