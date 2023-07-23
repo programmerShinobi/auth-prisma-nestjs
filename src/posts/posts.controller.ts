@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   Res,
+  Request,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
@@ -76,8 +77,8 @@ export class PostsController implements PostControllerInterface {
 
   @UseGuards(JwtAuthGuard)
   @Put('publish/:id')
-  async publishPost(@Param('id') id: string, @Res() res: Response): Promise<Response<PostsControllerDto>> {
-    const result = await this.postsService.publishPost(id);
+  async publishPost(@Param('id') id: string, @Request() req, @Res() res: Response): Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.publishPost(id, req.user.id);
     return res.status(200).send({
       message: "Data has been published",
       data: result
@@ -86,8 +87,8 @@ export class PostsController implements PostControllerInterface {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async deletePost(@Param('id') id: string, @Res() res: Response): Promise<Response<PostsControllerDto>> {
-    await this.postsService.deletePost(id);
+  async deletePost(@Param('id') id: string, @Request() req, @Res() res: Response): Promise<Response<PostsControllerDto>> {
+    await this.postsService.deletePost(id, req.user.id);
     return res.status(204).send();
   }
 }

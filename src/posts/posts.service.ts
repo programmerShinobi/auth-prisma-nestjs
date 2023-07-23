@@ -116,8 +116,8 @@ export class PostsService implements PostServiceInterface{
     }
   }
 
-  async post(idString: string): Promise<ItemPostDto> {
-    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = { id: idString };
+  async post(idPost: string): Promise<ItemPostDto> {
+    const postWhereUniqueInput: Prisma.PostWhereUniqueInput = { id: idPost };
     try {
       const result = await this.prisma.post.findUnique({
         where: postWhereUniqueInput,
@@ -130,12 +130,15 @@ export class PostsService implements PostServiceInterface{
     };
   }
 
-  async publishPost(idString: string): Promise<ItemPostDto> {
+  async publishPost(idPost: string, idUser: string): Promise<ItemPostDto> {
     const params: {
       where: Prisma.PostWhereUniqueInput;
       data: Prisma.PostUpdateInput;
     } = {
-      where: { id: idString },
+      where: {
+        id: idPost,
+        authorId: idUser
+      },
       data: { published: true }
     }
     const { data, where } = params;
@@ -155,8 +158,11 @@ export class PostsService implements PostServiceInterface{
     
   }
 
-  async deletePost(idString: string): Promise<ItemPostDto> {
-    const where: Prisma.PostWhereUniqueInput = { id: idString };
+  async deletePost(idPost: string, idUser: string): Promise<ItemPostDto> {
+    const where: Prisma.PostWhereUniqueInput = {
+      id: idPost,
+      authorId: idUser
+    };
     try {
       const result = await this.prisma.post.delete({
         where,
