@@ -27,39 +27,39 @@ export class PostsService implements PostServiceInterface{
     };
   }
   
-  async posts(
-    params: {
-      page: number; limit: number; where?: any; cursor?: Prisma.PostWhereUniqueInput;
-      orderBy?: Prisma.PostOrderByWithRelationInput;
-    }
-  ): Promise<any> {
-    const { page, limit, where, cursor, orderBy } = params;
-    await this.prisma.post.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      cursor,
-      orderBy,
-      where,
-    }).then(async(result: any) => {
-      const [items, totalItems] = await Promise.all([
-        result,
-        this.prisma.post.count({ where }),
-      ]);
+  // async posts(
+  //   params: {
+  //     page: number; limit: number; where?: any; cursor?: Prisma.PostWhereUniqueInput;
+  //     orderBy?: Prisma.PostOrderByWithRelationInput;
+  //   }
+  // ): Promise<any> {
+  //   const { page, limit, where, cursor, orderBy } = params;
+  //   await this.prisma.post.findMany({
+  //     skip: (page - 1) * limit,
+  //     take: limit,
+  //     cursor,
+  //     orderBy,
+  //     where,
+  //   }).then(async(result: any) => {
+  //     const [items, totalItems] = await Promise.all([
+  //       result,
+  //       this.prisma.post.count({ where }),
+  //     ]);
 
-      if (totalItems < 1) {
-        throw new NotFoundException("Data not found")
-      }
+  //     if (totalItems < 1) {
+  //       throw new NotFoundException("Data not found")
+  //     }
 
-      const pageCount = Math.ceil(totalItems / limit);
+  //     const pageCount = Math.ceil(totalItems / limit);
 
-      return {
-        message: "Data has been found",
-        data: { items, totalItems, pageCount }
-      };
-    }).catch((err) => {
-      throw new NotFoundException(err.response);
-    });
-  }
+  //     return {
+  //       message: "Data has been found",
+  //       data: { items, totalItems, pageCount }
+  //     };
+  //   }).catch((err) => {
+  //     throw new NotFoundException(err.response);
+  //   });
+  // }
 
   async getPaginatedPosts(page: number, limit: number): Promise<GetPosts> {
     const where = { published: true };

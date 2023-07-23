@@ -19,7 +19,6 @@ import PostsControllerDto from './dto/postsController.dto';
 import { UserId } from './decorators/user-id.decorator';
 import { UserEmail } from './decorators/user-email.decorator';
 
-
 @Controller({
   path: 'posts',
   version: '1'

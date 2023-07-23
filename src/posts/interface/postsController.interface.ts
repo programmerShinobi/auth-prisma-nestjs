@@ -2,7 +2,6 @@ import { Response } from 'express';
 import { CreatePostDto } from '../dto/create/createPosts.dto';  
 import PostsControllerDto from '../dto/postsController.dto';
 
-
 export default interface PostControllerInterface {
   createPost(dto: CreatePostDto, userEmail: string, res: Response): Promise<Response<PostsControllerDto>> ;
   getPaginatedPosts(res: Response): Promise<Response<PostsControllerDto>>;

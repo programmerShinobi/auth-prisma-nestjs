@@ -1,4 +1,3 @@
-import { Response } from 'express';
 import { CreatePostDto } from '../dto/create/createPosts.dto';
 import { GetPosts } from '../dto/get/getPosts.dto';
 import { ItemPostDto } from '../dto/items/itemsPost.dto';
