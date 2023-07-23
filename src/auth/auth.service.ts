@@ -8,14 +8,14 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { jwtSecret } from 'src/utils/constants';
 import AuthServiceInterface from './interface/authService.interface';
-import { SignupDto } from './dto/signup/signup.dto';
-import { SigninDto } from './dto/signin/signIn.dto';
+import { SignupParamsDto } from './dto/signup/signup.dto';
+import { SigninParamsDto } from './dto/signin/signIn.dto';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface{
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  async signup(dto: SignupDto): Promise<ItemAuthDto> {
+  async signup(dto: SignupParamsDto): Promise<ItemAuthDto> {
     const { name, email, password } = dto;
     try {
       const userExists = await this.prisma.user.findUnique({
@@ -42,7 +42,7 @@ export class AuthService implements AuthServiceInterface{
     }
   }
 
-  async signin(dto: SigninDto): Promise<ItemAuthDto> {
+  async signin(dto: SigninParamsDto): Promise<ItemAuthDto> {
     const { email, password } = dto;
 
     const foundUser: ItemAuthDto = await this.prisma.user.findUnique({

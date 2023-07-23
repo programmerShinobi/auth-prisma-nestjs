@@ -1,10 +1,10 @@
 import { Body, Controller, ForbiddenException, Get, Post, Req, Res} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto } from './dto/signup/signup.dto';
+import { SignupParamsDto } from './dto/signup/signup.dto';
 import { Response } from 'express';
 import AuthControllerInterface from './interface/authController.interface';
 import { AuthControllerDto } from './dto/authController.dto';
-import { SigninDto } from './dto/signin/signIn.dto';
+import { SigninParamsDto } from './dto/signin/signIn.dto';
 
 @Controller({
   path: 'auth',
@@ -14,7 +14,7 @@ export class AuthController implements AuthControllerInterface {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  async signup(@Body() dto: SignupDto, @Res() res: Response): Promise<Response<AuthControllerDto>> {
+  async signup(@Body() dto: SignupParamsDto, @Res() res: Response): Promise<Response<AuthControllerDto>> {
     const result = await this.authService.signup(dto);
     return res.status(200).send({
       message: 'User created succefully',
@@ -23,7 +23,7 @@ export class AuthController implements AuthControllerInterface {
   }
 
   @Post('signin')
-  async signin(@Res() res: Response, @Body() dto: SigninDto): Promise<Response<AuthControllerDto>> {
+  async signin(@Res() res: Response, @Body() dto: SigninParamsDto): Promise<Response<AuthControllerDto>> {
     const result = await this.authService.signin(dto);
    
     const token = await this.authService.signToken({
