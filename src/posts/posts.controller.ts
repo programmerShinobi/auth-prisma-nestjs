@@ -26,20 +26,6 @@ import { UserEmail } from './decorators/user-email.decorator';
 export class PostsController implements PostControllerInterface {
   constructor(private readonly postsService: PostsService) { }
 
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  async createPost(
-    @Body() dto: CreatePostDto,
-    @UserEmail() userEmail: string,
-    @Res() res: Response
-  ): Promise<Response<PostsControllerDto>> {
-    const result = await this.postsService.createPost(dto, userEmail);
-    return res.status(201).send({
-      message: "Data has been created",
-      data: result
-    })
-  }
-
   @Get()
   async getPosts(
     @Res() res: Response,
@@ -61,6 +47,20 @@ export class PostsController implements PostControllerInterface {
       message: "Data has been found",
       data: result
     }) 
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async createPost(
+    @Body() dto: CreatePostDto,
+    @UserEmail() userEmail: string,
+    @Res() res: Response
+  ): Promise<Response<PostsControllerDto>> {
+    const result = await this.postsService.createPost(dto, userEmail);
+    return res.status(201).send({
+      message: "Data has been created",
+      data: result
+    })
   }
 
   @UseGuards(JwtAuthGuard)

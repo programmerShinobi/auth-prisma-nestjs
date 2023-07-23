@@ -9,23 +9,6 @@ import { ItemPostDto } from './dto/items/itemsPost.dto';
 @Injectable()
 export class PostsService implements PostServiceInterface{
   constructor(private prisma: PrismaService) {}
-
-  async createPost(dto: CreatePostDto, userEmail: string): Promise<ItemPostDto> {
-    const { title, content } = dto;
-    const data: Prisma.PostCreateInput = {
-      title,
-      content,
-      author: {
-        connect: { email: userEmail }
-      },
-    };
-    try {
-      const result = await this.prisma.post.create({ data });
-      return result;
-    } catch(err) {
-      throw new BadRequestException(err.response)
-    };
-  }
   
   // async posts(
   //   params: {
@@ -112,6 +95,23 @@ export class PostsService implements PostServiceInterface{
       return result;
     } catch(err) {
       throw new NotFoundException(err.response)
+    };
+  }
+
+  async createPost(dto: CreatePostDto, userEmail: string): Promise<ItemPostDto> {
+    const { title, content } = dto;
+    const data: Prisma.PostCreateInput = {
+      title,
+      content,
+      author: {
+        connect: { email: userEmail }
+      },
+    };
+    try {
+      const result = await this.prisma.post.create({ data });
+      return result;
+    } catch(err) {
+      throw new BadRequestException(err.response)
     };
   }
 
