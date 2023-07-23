@@ -41,26 +41,13 @@ export class PostsController implements PostControllerInterface {
   }
 
   @Get()
-  async getPaginatedPosts(
+  async getPosts(
     @Res() res: Response,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10
-  ) : Promise<Response<PostsControllerDto>> {
-    const result = await this.postsService.getPaginatedPosts(page, limit);
-    return res.status(200).send({
-      message: "Data has been found",
-      data: result
-    })
-  }
-
-  @Get('filter/:searchString')
-  async getFilteredPosts(
-    @Param('searchString') searchString: string,
-    @Res() res: Response,
+    @Query('search') search: string = null,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) : Promise<Response<PostsControllerDto>> {
-    const result = await this.postsService.getFilteredPosts(page, limit, searchString);
+    const result = await this.postsService.getPosts(search, page, limit);
     return res.status(200).send({
       message: "Data has been found",
       data: result

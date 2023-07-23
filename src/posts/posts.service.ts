@@ -61,40 +61,25 @@ export class PostsService implements PostServiceInterface{
   //   });
   // }
 
-  async getPaginatedPosts(page: number, limit: number): Promise<GetPosts> {
-    const where = { published: true };
-    try {
-      const [items, totalItems] = await Promise.all([
-        this.prisma.post.findMany({
-          skip: (page - 1) * limit,
-          take: limit,
-          where,
-        }),
-        this.prisma.post.count({ where }),
-      ]);
-
-      if (totalItems < 1) throw new NotFoundException();
-
-      const pageCount = Math.ceil(totalItems / limit);
-      const data: GetPosts = { items, totalItems, pageCount };
-      return data;
-    } catch (err) {
-      throw new NotFoundException(err.response);
-    }
-  }
-
-  async getFilteredPosts(page: number, limit: number, searchString: string): Promise<GetPosts> {
-    const where = { 
-      AND: { published: true },
+  async getPosts(search: string | null, page: number, limit: number): Promise<GetPosts> {
+    let where = {};
+    if (search) {
+      where = {
+        AND: { published: true },
         OR: [
           {
-            title: { contains: searchString },
+            title: { contains: search },
           },
           {
-            content: { contains: searchString },
+            content: { contains: search },
           }
         ],
-    };
+      };
+    } else {
+      where = {
+        AND: { published: true }
+      };
+    }
     
     try {
       const [items, totalItems] = await Promise.all([

@@ -4,8 +4,7 @@ import PostsControllerDto from '../dto/postsController.dto';
 
 export default interface PostControllerInterface {
   createPost(dto: CreatePostDto, userEmail: string, res: Response): Promise<Response<PostsControllerDto>> ;
-  getPaginatedPosts(res: Response): Promise<Response<PostsControllerDto>>;
-  getFilteredPosts(searchString: string, res: Response): Promise<Response<PostsControllerDto>>;
+  getPosts(res: Response): Promise<Response<PostsControllerDto>>;
   getPostById( postId: string, res: Response): Promise<Response<PostsControllerDto>>;
   publishPost(postId: string, userId: string, res: Response): Promise<Response<PostsControllerDto>>;
   deletePost(postId: string,  userId: string, res: Response): Promise<Response<PostsControllerDto>>;
