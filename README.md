@@ -108,7 +108,7 @@ Body >>> raw :
 [POST] : http://localhost:3000/v1/posts
 Body >>> raw :
 {
-    "title" : "Others",
+    "title" : "This Is Title Others",
     "content" : "This is content others"
 }
 ```
