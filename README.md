@@ -94,13 +94,8 @@ Body >>> raw :
 ```
 
 ```bash
-# posts page 1 & limit 3
-[GET] : http://localhost:3000/v1/posts?page=1&limit=3
-```
-
-```bash
-# posts by filter(value) page 1 & limit 3
-[GET] : http://localhost:3000/v1/posts/filter/value?page=1&limit=3
+# posts (search: shinobi, page: 1, limit 10)
+[GET] : http://localhost:3000/v1/posts?search=Shinobi&page=1&limit=10
 ```
 
 ```bash
