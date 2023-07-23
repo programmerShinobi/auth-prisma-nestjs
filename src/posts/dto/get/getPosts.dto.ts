@@ -1,7 +1,7 @@
 import { IsArray, IsNumber } from "class-validator";
 import { ItemPostDto } from "../items/itemsPost.dto";
 
-export class GetPostsFunction {
+export class GetPostsFunctionDto {
   @IsArray()
   items: ItemPostDto[];
 

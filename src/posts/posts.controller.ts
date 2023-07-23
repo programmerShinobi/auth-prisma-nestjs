@@ -13,7 +13,7 @@ import {
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import PostControllerInterface from './interface/postsController.interface';
-import { CreatePostDto } from './dto/create/createPosts.dto';
+import { CreatePostParamsDto } from './dto/create/createPosts.dto';
 import { Response } from 'express';
 import PostsControllerDto from './dto/postsController.dto';
 import { UserId } from './decorators/user-id.decorator';
@@ -52,7 +52,7 @@ export class PostsController implements PostControllerInterface {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createPost(
-    @Body() dto: CreatePostDto,
+    @Body() dto: CreatePostParamsDto,
     @UserEmail() userEmail: string,
     @Res() res: Response
   ): Promise<Response<PostsControllerDto>> {

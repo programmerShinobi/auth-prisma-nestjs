@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { CreatePostDto } from './dto/create/createPosts.dto'; 
+import { CreatePostParamsDto } from './dto/create/createPosts.dto'; 
 import PostServiceInterface from './interface/postsService.interface';
-import { GetPostsFunction } from './dto/get/getPosts.dto';
+import { GetPostsFunctionDto } from './dto/get/getPosts.dto';
 import { ItemPostDto } from './dto/items/itemsPost.dto';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class PostsService implements PostServiceInterface{
   //   });
   // }
 
-  async getPosts(search: string | null, page: number, limit: number): Promise<GetPostsFunction> {
+  async getPosts(search: string | null, page: number, limit: number): Promise<GetPostsFunctionDto> {
     let where = {};
     if (search) {
       where = {
@@ -77,7 +77,7 @@ export class PostsService implements PostServiceInterface{
       if (totalItems < 1) throw new NotFoundException();
 
       const pageCount = Math.ceil(totalItems / limit);
-      const data: GetPostsFunction = { items, totalItems, pageCount };
+      const data: GetPostsFunctionDto = { items, totalItems, pageCount };
       return data;
     } catch (err) {
       throw new NotFoundException(err.response);
@@ -98,7 +98,7 @@ export class PostsService implements PostServiceInterface{
     };
   }
 
-  async createPost(dto: CreatePostDto, userEmail: string): Promise<ItemPostDto> {
+  async createPost(dto: CreatePostParamsDto, userEmail: string): Promise<ItemPostDto> {
     const { title, content } = dto;
     const data: Prisma.PostCreateInput = {
       title,
