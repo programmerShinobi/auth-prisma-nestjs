@@ -109,8 +109,7 @@ Body >>> raw :
 Body >>> raw :
 {
     "title" : "Others",
-    "content" : "This is content others",
-    "authorEmail" : "email@opencloud.id"
+    "content" : "This is content others"
 }
 ```
 
