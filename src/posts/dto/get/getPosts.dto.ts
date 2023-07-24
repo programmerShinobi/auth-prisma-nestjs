@@ -28,7 +28,7 @@ export class GetPostsParamsDto {
   limit: number = 10;
 
   @IsOptional()
-  cursor: Prisma.PostWhereUniqueInput = { id: '199fc9fb-1a5d-4878-bf94-2c9211006c20' };
+  cursor: Prisma.PostWhereUniqueInput;
 
   @IsOptional()
   orderBy: Prisma.PostOrderByWithRelationInput = { authorId: 'asc' };
