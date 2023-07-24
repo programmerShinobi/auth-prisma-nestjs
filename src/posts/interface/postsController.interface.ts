@@ -4,7 +4,7 @@ import PostsControllerDto from '../dto/postsController.dto';
 import { GetPostsParamsDto } from '../dto/get/getPosts.dto';
 
 export default interface PostControllerInterface {
-  createPost(dto: CreatePostParamsDto, userEmail: string, res: Response): Promise<Response<PostsControllerDto>> ;
+  createPost(dto: CreatePostParamsDto, userEmail: string, res: Response): Promise<Response<PostsControllerDto>>;
   getPosts(dto: GetPostsParamsDto, res: Response): Promise<Response<PostsControllerDto>>;
   getPostById( postId: string, res: Response): Promise<Response<PostsControllerDto>>;
   publishPost(postId: string, userId: string, res: Response): Promise<Response<PostsControllerDto>>;

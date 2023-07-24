@@ -38,7 +38,7 @@ export class PostsController implements PostControllerInterface {
     return res.status(200).send({
       message: "Data has been found",
       data: result
-    })
+    });
   }
 
   @Get(':id')

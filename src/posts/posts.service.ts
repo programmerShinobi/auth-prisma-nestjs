@@ -12,9 +12,6 @@ export class PostsService implements PostServiceInterface{
 
   async getPosts(dto: GetPostsParamsDto): Promise<GetPostsFunctionDto> {
     const { search, page, limit, cursor, orderBy } = dto;
-    if (isNaN(page)) throw new BadRequestException("Page must be numbered");
-    if (isNaN(limit)) throw new BadRequestException("Limit must be numbered");
-    const parseIntLimit: number = Number(limit);
     const where = search
       ? {
           AND: { published: true },
@@ -26,11 +23,11 @@ export class PostsService implements PostServiceInterface{
       : { AND: { published: true } };
 
     try {
-      const skip = (page - 1) * (parseIntLimit || 10);
+      const skip = (page - 1) * limit;
       const [items, totalItems] = await Promise.all([
         this.prisma.post.findMany({
           skip,
-          take: parseIntLimit || 10,
+          take: limit,
           cursor,
           orderBy,
           where,
@@ -40,7 +37,7 @@ export class PostsService implements PostServiceInterface{
 
       if (totalItems < 1) throw new NotFoundException();
 
-      const pageCount = Math.ceil(totalItems / parseIntLimit);
+      const pageCount = Math.ceil(totalItems / limit);
       const data: GetPostsFunctionDto = { items, totalItems, pageCount };
       return data;
     } catch (err) {
