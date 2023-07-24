@@ -12,8 +12,8 @@ export class PostsService implements PostServiceInterface{
 
   async getPosts(dto: GetPostsParamsDto): Promise<GetPostsFunctionDto> {
     const { search, page, limit, cursor, orderBy } = dto;
-    if (isNaN(page)) throw new BadRequestException("Page must be number");
-    if (isNaN(limit)) throw new BadRequestException("Limit must be number");
+    if (isNaN(page)) throw new BadRequestException("Page must be numbered");
+    if (isNaN(limit)) throw new BadRequestException("Limit must be numbered");
     const parseIntLimit: number = Number(limit);
     const where = search
       ? {
