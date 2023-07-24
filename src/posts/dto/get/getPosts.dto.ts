@@ -1,5 +1,6 @@
-import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { ItemPostDto } from "../items/itemsPost.dto";
+import { Prisma } from "@prisma/client";
 
 export class GetPostsFunctionDto {
   @IsArray()
@@ -13,6 +14,7 @@ export class GetPostsFunctionDto {
 }
 
 export class GetPostsParamsDto {
+  @IsOptional()
   @IsString()
   search: string = '';
 
@@ -21,4 +23,10 @@ export class GetPostsParamsDto {
 
   @IsNotEmpty()
   limit: number = 10;
+
+  @IsOptional()
+  cursor: Prisma.PostWhereUniqueInput;
+
+  @IsOptional()
+  orderBy: Prisma.PostOrderByWithRelationInput;
 }

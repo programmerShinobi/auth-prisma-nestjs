@@ -9,6 +9,8 @@ import {
   UseGuards,
   Query,
   Res,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
@@ -31,9 +33,7 @@ export class PostsController implements PostControllerInterface {
   async getPosts(
     @Query() dto: GetPostsParamsDto,
     @Res() res: Response,
-    @Query('limit') limit: number,
   ): Promise<Response<PostsControllerDto>> {
-    if (limit) dto.limit = limit;
     const result = await this.postsService.getPosts(dto);
     return res.status(200).send({
       message: "Data has been found",

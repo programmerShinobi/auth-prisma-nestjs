@@ -9,67 +9,28 @@ import { ItemPostDto } from './dto/items/itemsPost.dto';
 @Injectable()
 export class PostsService implements PostServiceInterface{
   constructor(private prisma: PrismaService) {}
-  
-  // async posts(
-  //   params: {
-  //     page: number; limit: number; where?: any; cursor?: Prisma.PostWhereUniqueInput;
-  //     orderBy?: Prisma.PostOrderByWithRelationInput;
-  //   }
-  // ): Promise<any> {
-  //   const { page, limit, where, cursor, orderBy } = params;
-  //   await this.prisma.post.findMany({
-  //     skip: (page - 1) * limit,
-  //     take: limit,
-  //     cursor,
-  //     orderBy,
-  //     where,
-  //   }).then(async(result: any) => {
-  //     const [items, totalItems] = await Promise.all([
-  //       result,
-  //       this.prisma.post.count({ where }),
-  //     ]);
-
-  //     if (totalItems < 1) {
-  //       throw new NotFoundException("Data not found")
-  //     }
-
-  //     const pageCount = Math.ceil(totalItems / limit);
-
-  //     return {
-  //       message: "Data has been found",
-  //       data: { items, totalItems, pageCount }
-  //     };
-  //   }).catch((err) => {
-  //     throw new NotFoundException(err.response);
-  //   });
-  // }
 
   async getPosts(dto: GetPostsParamsDto): Promise<GetPostsFunctionDto> {
-    const { search, page, limit } = dto;
-    let where = {};
-    if (search) {
-      where = {
-        AND: { published: true },
-        OR: [
-          {
-            title: { contains: search },
-          },
-          {
-            content: { contains: search },
-          }
-        ],
-      };
-    } else {
-      where = {
-        AND: { published: true }
-      };
-    }
-    
+    const { search, page, limit, cursor, orderBy } = dto;
+    const parseIntLimit: number = Number(limit);
+    const where = search
+      ? {
+          AND: { published: true },
+          OR: [
+            { title: { contains: search } },
+            { content: { contains: search } },
+          ],
+        }
+      : { AND: { published: true } };
+
     try {
+      const skip = (page - 1) * (parseIntLimit || 10);
       const [items, totalItems] = await Promise.all([
         this.prisma.post.findMany({
-          skip: (page - 1) * limit,
-          take: limit,
+          skip,
+          take: parseIntLimit || 10,
+          cursor,
+          orderBy,
           where,
         }),
         this.prisma.post.count({ where }),
@@ -77,7 +38,7 @@ export class PostsService implements PostServiceInterface{
 
       if (totalItems < 1) throw new NotFoundException();
 
-      const pageCount = Math.ceil(totalItems / limit);
+      const pageCount = Math.ceil(totalItems / parseIntLimit);
       const data: GetPostsFunctionDto = { items, totalItems, pageCount };
       return data;
     } catch (err) {
